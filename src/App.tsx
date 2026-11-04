@@ -7,6 +7,7 @@ import { Keyboard } from './components/Keyboard';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsModal } from './components/StatsModal';
 import { Toast } from './components/Toast';
+import { EasterEggVideo } from './components/EasterEggVideo';
 import { useGame } from './hooks/useGame';
 
 const THEME_KEY = 'word500-theme';
@@ -154,6 +155,10 @@ function App() {
 
       {/* Toast Notification */}
       <Toast message={game.toastMessage} visible={game.toastVisible} />
+
+      {/* Easter egg: guessing BOXEN */}
+      {/* Mounted only while open so each showing starts fresh */}
+      {game.easterEggOpen && <EasterEggVideo isOpen onClose={game.closeEasterEgg} />}
 
       {/* Modals */}
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />

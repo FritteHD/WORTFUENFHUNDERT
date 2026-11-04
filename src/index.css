@@ -96,6 +96,27 @@
   animation: flip-in 0.35s ease-out;
 }
 
+/* ---------- Easter egg (BOXEN) ---------- */
+
+/* Video spins in and grows from a dot to full size */
+@keyframes easter-spin {
+  0% { transform: scale(0.05) rotate(-720deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-easter-spin {
+  animation: easter-spin 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes easter-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-easter-backdrop {
+  animation: easter-backdrop 0.6s ease-out both;
+}
+
 .animate-shake {
   animation: shake 0.35s ease-in-out;
 }

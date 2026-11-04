@@ -26,6 +26,8 @@ const DAY_CHECK_INTERVAL_MS = 30_000;
 const SOLVE_ROW_DELAY_MS = 220;
 const SOLVE_TILE_DELAY_MS = 60;
 const SOLVE_FLIP_MS = 350;
+/** Submitting this word plays the easter egg video */
+const EASTER_EGG_WORD = 'BOXEN';
 
 interface UseGameReturn {
   guesses: GuessResult[];
@@ -48,6 +50,9 @@ interface UseGameReturn {
   solveAnimationMs: number;
   /** True once the game is over: manual coloring is disabled */
   colorsLocked: boolean;
+  /** Easter egg video is showing (after guessing BOXEN) */
+  easterEggOpen: boolean;
+  closeEasterEgg: () => void;
   cycleTileColor: (rowIndex: number, colIndex: number) => void;
   cycleKeyColor: (letter: string) => void;
   clearColors: () => void;
@@ -97,6 +102,8 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
   const [colorsDate, setColorsDate] = useState<string | null>(null);
   const [flipTiles, setFlipTiles] = useState<Set<string>>(new Set());
   const [solveAnimationMs, setSolveAnimationMs] = useState(0);
+  const [easterEggOpen, setEasterEggOpen] = useState(false);
+  const closeEasterEgg = useCallback(() => setEasterEggOpen(false), []);
   const solveTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const isProcessing = useRef(false);
@@ -318,6 +325,8 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
       return;
     }
 
+    if (upperGuess === EASTER_EGG_WORD) setEasterEggOpen(true);
+
     isProcessing.current = true;
     const result = evaluateGuess(upperGuess, targetWord);
     const guessResult: GuessResult = { word: upperGuess, ...result };
@@ -458,6 +467,8 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     flipTiles,
     solveAnimationMs,
     colorsLocked,
+    easterEggOpen,
+    closeEasterEgg,
     cycleTileColor,
     cycleKeyColor,
     clearColors,
