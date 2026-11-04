@@ -136,7 +136,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
 
   useEffect(() => () => solveTimers.current.forEach(clearTimeout), []);
 
-  // On a win: flip every tile to its true color one by one, then color the keyboard
+  // At game end (win or loss): flip every tile to its true color one by one, then color the keyboard
   const playSolveAnimation = useCallback(
     (words: string[], target: string) => {
       cancelSolveAnimation();
@@ -333,6 +333,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
         setGameStatus('lost');
         setStatistics(updateStatistics(gameMode, false, newGuesses.length, puzzleDate ?? undefined));
         showToast(`Das Wort war: ${targetWord}`, 4000);
+        playSolveAnimation(newGuesses.map((g) => g.word), targetWord);
       }
 
       // Save under the puzzle's own date, even if midnight passed meanwhile
