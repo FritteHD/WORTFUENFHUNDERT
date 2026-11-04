@@ -123,6 +123,7 @@ function App() {
             revealRow={game.revealRow}
             tileColors={game.tileColors}
             flipTiles={game.flipTiles}
+            locked={game.colorsLocked}
             onTileClick={game.cycleTileColor}
           />
         </main>
@@ -146,6 +147,7 @@ function App() {
             onKeyColorCycle={game.cycleKeyColor}
             onClearColors={game.clearColors}
             onOpenHelp={() => setShowHelp(true)}
+            colorsLocked={game.colorsLocked}
           />
         </footer>
       </div>

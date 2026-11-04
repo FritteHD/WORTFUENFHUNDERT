@@ -8,6 +8,8 @@ interface Props {
   onKeyColorCycle?: (letter: string) => void;
   onClearColors?: () => void;
   onOpenHelp?: () => void;
+  /** Game over: manual colors can no longer be changed */
+  colorsLocked?: boolean;
 }
 
 export const Keyboard: React.FC<Props> = ({
@@ -17,6 +19,7 @@ export const Keyboard: React.FC<Props> = ({
   onKeyColorCycle,
   onClearColors,
   onOpenHelp,
+  colorsLocked = false,
 }) => {
   const row1 = ['Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P'];
   const row2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
@@ -122,8 +125,10 @@ export const Keyboard: React.FC<Props> = ({
         <button
           type="button"
           onClick={onClearColors}
-          className="w-12 sm:w-14 h-11 sm:h-12 bg-control hover:bg-control-hover text-fg/80 hover:text-fg rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
-          title="Farbmarkierungen zurücksetzen"
+          className={`w-12 sm:w-14 h-11 sm:h-12 bg-control hover:bg-control-hover text-fg/80 hover:text-fg rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer ${
+            colorsLocked ? 'opacity-40' : ''
+          }`}
+          title={colorsLocked ? 'Spiel beendet – Farben sind fest' : 'Farbmarkierungen zurücksetzen'}
           aria-label="Farben löschen"
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

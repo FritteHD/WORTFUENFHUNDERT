@@ -11,6 +11,8 @@ interface Props {
   revealRow: number | null;
   tileColors: Record<string, TileColor>;
   flipTiles?: Set<string>;
+  /** Game over: tiles can no longer be recolored */
+  locked?: boolean;
   onTileClick: (rowIndex: number, colIndex: number) => void;
 }
 
@@ -23,6 +25,7 @@ export const GameBoard: React.FC<Props> = ({
   revealRow,
   tileColors,
   flipTiles,
+  locked = false,
   onTileClick,
 }) => {
   const getTileStyle = (rowIndex: number, colIndex: number, hasLetter: boolean) => {
@@ -70,7 +73,8 @@ export const GameBoard: React.FC<Props> = ({
                 const letter = word[colIndex] || '';
                 const isPlaceholder = letter === PLACEHOLDER;
                 const hasLetter = letter.length > 0;
-                const isClickable = isSubmitted || (isCurrent && hasLetter && !isPlaceholder);
+                const isClickable =
+                  !locked && (isSubmitted || (isCurrent && hasLetter && !isPlaceholder));
 
                 return (
                   <button

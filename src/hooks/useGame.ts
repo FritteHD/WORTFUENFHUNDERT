@@ -46,6 +46,8 @@ interface UseGameReturn {
   flipTiles: Set<string>;
   /** Total length of the running win animation in ms (0 if none) */
   solveAnimationMs: number;
+  /** True once the game is over: manual coloring is disabled */
+  colorsLocked: boolean;
   cycleTileColor: (rowIndex: number, colIndex: number) => void;
   cycleKeyColor: (letter: string) => void;
   clearColors: () => void;
@@ -113,19 +115,34 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     if (toastTimer.current) clearTimeout(toastTimer.current);
   }, []);
 
-  const cycleTileColor = useCallback((rowIndex: number, colIndex: number) => {
-    setTileColors((prev) => cycleInRecord(prev, `${rowIndex}-${colIndex}`));
-  }, []);
+  // After the game ends the revealed colors are final and can no longer be changed
+  const colorsLocked = gameStatus !== 'playing';
 
-  const cycleKeyColor = useCallback((letter: string) => {
-    setKeyColors((prev) => cycleInRecord(prev, letter));
-  }, []);
+  const cycleTileColor = useCallback(
+    (rowIndex: number, colIndex: number) => {
+      if (colorsLocked) return;
+      setTileColors((prev) => cycleInRecord(prev, `${rowIndex}-${colIndex}`));
+    },
+    [colorsLocked]
+  );
+
+  const cycleKeyColor = useCallback(
+    (letter: string) => {
+      if (colorsLocked) return;
+      setKeyColors((prev) => cycleInRecord(prev, letter));
+    },
+    [colorsLocked]
+  );
 
   const clearColors = useCallback(() => {
+    if (colorsLocked) {
+      showToast('Spiel beendet – Farben sind fest');
+      return;
+    }
     setTileColors({});
     setKeyColors({});
     showToast('Farbmarkierungen gelöscht');
-  }, [showToast]);
+  }, [colorsLocked, showToast]);
 
   const cancelSolveAnimation = useCallback(() => {
     solveTimers.current.forEach(clearTimeout);
@@ -440,6 +457,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     keyColors,
     flipTiles,
     solveAnimationMs,
+    colorsLocked,
     cycleTileColor,
     cycleKeyColor,
     clearColors,
