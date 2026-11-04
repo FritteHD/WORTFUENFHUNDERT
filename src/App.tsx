@@ -56,13 +56,14 @@ function App() {
 
   const game = useGame(targetWords, validGuesses);
 
-  // Show stats automatically after game over
+  // Show stats automatically after game over (after the win animation, if one is running)
+  const { gameStatus, solveAnimationMs } = game;
   useEffect(() => {
-    if (game.gameStatus !== 'playing') {
-      const timer = setTimeout(() => setShowStats(true), 1500);
+    if (gameStatus !== 'playing') {
+      const timer = setTimeout(() => setShowStats(true), Math.max(1500, solveAnimationMs + 1000));
       return () => clearTimeout(timer);
     }
-  }, [game.gameStatus]);
+  }, [gameStatus, solveAnimationMs]);
 
   if (loading) {
     return (
@@ -121,6 +122,7 @@ function App() {
             shakeRow={game.shakeRow}
             revealRow={game.revealRow}
             tileColors={game.tileColors}
+            flipTiles={game.flipTiles}
             onTileClick={game.cycleTileColor}
           />
         </main>

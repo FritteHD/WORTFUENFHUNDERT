@@ -10,6 +10,7 @@ interface Props {
   shakeRow: number | null;
   revealRow: number | null;
   tileColors: Record<string, TileColor>;
+  flipTiles?: Set<string>;
   onTileClick: (rowIndex: number, colIndex: number) => void;
 }
 
@@ -21,6 +22,7 @@ export const GameBoard: React.FC<Props> = ({
   shakeRow,
   revealRow,
   tileColors,
+  flipTiles,
   onTileClick,
 }) => {
   const getTileStyle = (rowIndex: number, colIndex: number, hasLetter: boolean) => {
@@ -82,6 +84,7 @@ export const GameBoard: React.FC<Props> = ({
                       ${getTileStyle(rowIndex, colIndex, hasLetter)}
                       ${isClickable ? 'cursor-pointer active:scale-95' : 'cursor-default'}
                       ${isCurrent && hasLetter ? 'animate-pop' : ''}
+                      ${flipTiles?.has(`${rowIndex}-${colIndex}`) ? 'animate-flip-in' : ''}
                     `}
                     title={
                       isClickable

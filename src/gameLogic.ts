@@ -1,4 +1,4 @@
-import type { Statistics, DailyState, GameMode, SavedColors } from './types';
+import type { Statistics, DailyState, GameMode, SavedColors, TileColor } from './types';
 
 export function evaluateGuess(guess: string, target: string): { green: number; yellow: number; red: number } {
   guess = guess.toUpperCase();
@@ -38,6 +38,45 @@ export function evaluateGuess(guess: string, target: string): { green: number; y
 
   const red = guess.length - green - yellow;
   return { green, yellow, red };
+}
+
+/**
+ * Per-letter colors for a guess, Wordle-style: exact matches are green, remaining
+ * letters that still occur in the target are yellow (respecting letter counts), the rest red.
+ */
+export function letterColors(guess: string, target: string): TileColor[] {
+  guess = guess.toUpperCase();
+  target = target.toUpperCase();
+  const colors: TileColor[] = new Array(guess.length).fill('red');
+  const remaining: Record<string, number> = {};
+
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] === target[i]) colors[i] = 'green';
+    else remaining[target[i]] = (remaining[target[i]] || 0) + 1;
+  }
+  for (let i = 0; i < guess.length; i++) {
+    if (colors[i] === 'green') continue;
+    if (remaining[guess[i]] > 0) {
+      colors[i] = 'yellow';
+      remaining[guess[i]]--;
+    }
+  }
+  return colors;
+}
+
+/** Keyboard color per letter: green if ever placed correctly, else yellow if in the word, else red */
+export function keyboardColors(guesses: string[], target: string): Record<string, TileColor> {
+  const rank: Record<TileColor, number> = { default: 0, red: 1, yellow: 2, green: 3 };
+  const result: Record<string, TileColor> = {};
+  for (const guess of guesses) {
+    letterColors(guess, target).forEach((color, i) => {
+      const letter = guess[i].toUpperCase();
+      // A letter that occurs in the target is at least yellow, even if this occurrence was red
+      const effective: TileColor = color === 'red' && target.toUpperCase().includes(letter) ? 'yellow' : color;
+      if (rank[effective] > rank[result[letter] || 'default']) result[letter] = effective;
+    });
+  }
+  return result;
 }
 
 export function getDailyWord(targetWords: string[], dateStr?: string): string {

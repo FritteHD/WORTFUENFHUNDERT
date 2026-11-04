@@ -85,6 +85,17 @@
   animation: reveal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Win animation: tile turns in edge-on, already showing its true color */
+@keyframes flip-in {
+  0% { transform: perspective(300px) rotateX(90deg); }
+  60% { transform: perspective(300px) rotateX(-12deg); }
+  100% { transform: perspective(300px) rotateX(0); }
+}
+
+.animate-flip-in {
+  animation: flip-in 0.35s ease-out;
+}
+
 .animate-shake {
   animation: shake 0.35s ease-in-out;
 }

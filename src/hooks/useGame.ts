@@ -12,6 +12,8 @@ import {
   loadSavedColors,
   saveColors,
   getTodayDateString,
+  letterColors,
+  keyboardColors,
 } from '../gameLogic';
 
 const MAX_ATTEMPTS = 8;
@@ -20,6 +22,10 @@ const WORD_LENGTH = 5;
 export const PLACEHOLDER = '-';
 /** How often to check whether a new daily puzzle is available */
 const DAY_CHECK_INTERVAL_MS = 30_000;
+/** Win animation timing: tiles flip in row by row, left to right */
+const SOLVE_ROW_DELAY_MS = 220;
+const SOLVE_TILE_DELAY_MS = 60;
+const SOLVE_FLIP_MS = 350;
 
 interface UseGameReturn {
   guesses: GuessResult[];
@@ -36,6 +42,10 @@ interface UseGameReturn {
   toastVisible: boolean;
   tileColors: Record<string, TileColor>;
   keyColors: Record<string, TileColor>;
+  /** Tiles ("row-col") currently playing the win flip animation */
+  flipTiles: Set<string>;
+  /** Total length of the running win animation in ms (0 if none) */
+  solveAnimationMs: number;
   cycleTileColor: (rowIndex: number, colIndex: number) => void;
   cycleKeyColor: (letter: string) => void;
   clearColors: () => void;
@@ -83,6 +93,9 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
   const [keyColors, setKeyColors] = useState<Record<string, TileColor>>({});
   // Date under which manual colors are persisted (daily mode only, null = don't persist)
   const [colorsDate, setColorsDate] = useState<string | null>(null);
+  const [flipTiles, setFlipTiles] = useState<Set<string>>(new Set());
+  const [solveAnimationMs, setSolveAnimationMs] = useState(0);
+  const solveTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const isProcessing = useRef(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,6 +127,46 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     showToast('Farbmarkierungen gelöscht');
   }, [showToast]);
 
+  const cancelSolveAnimation = useCallback(() => {
+    solveTimers.current.forEach(clearTimeout);
+    solveTimers.current = [];
+    setFlipTiles(new Set());
+    setSolveAnimationMs(0);
+  }, []);
+
+  useEffect(() => () => solveTimers.current.forEach(clearTimeout), []);
+
+  // On a win: flip every tile to its true color one by one, then color the keyboard
+  const playSolveAnimation = useCallback(
+    (words: string[], target: string) => {
+      cancelSolveAnimation();
+      const lastRowEnd = (words.length - 1) * SOLVE_ROW_DELAY_MS + (WORD_LENGTH - 1) * SOLVE_TILE_DELAY_MS;
+      setSolveAnimationMs(lastRowEnd + SOLVE_FLIP_MS);
+
+      words.forEach((word, row) => {
+        const colors = letterColors(word, target);
+        colors.forEach((color, col) => {
+          const key = `${row}-${col}`;
+          const delay = row * SOLVE_ROW_DELAY_MS + col * SOLVE_TILE_DELAY_MS;
+          solveTimers.current.push(
+            setTimeout(() => {
+              setTileColors((prev) => ({ ...prev, [key]: color }));
+              setFlipTiles((prev) => new Set(prev).add(key));
+            }, delay)
+          );
+        });
+      });
+
+      solveTimers.current.push(
+        setTimeout(() => {
+          setKeyColors(keyboardColors(words, target));
+          setFlipTiles(new Set());
+        }, lastRowEnd + SOLVE_FLIP_MS)
+      );
+    },
+    [cancelSolveAnimation]
+  );
+
   // Persist manual colors for the daily puzzle
   useEffect(() => {
     if (colorsDate) saveColors(colorsDate, { tileColors, keyColors });
@@ -124,6 +177,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     (mode: GameMode) => {
       if (targetWords.length === 0) return;
 
+      cancelSolveAnimation();
       setStatistics(loadStatistics(mode));
 
       if (mode === 'daily') {
@@ -164,7 +218,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
       setCurrentGuess('');
       isProcessing.current = false;
     },
-    [targetWords]
+    [targetWords, cancelSolveAnimation]
   );
 
   useEffect(() => {
@@ -273,6 +327,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
         setGameStatus('won');
         setStatistics(updateStatistics(gameMode, true, newGuesses.length, puzzleDate ?? undefined));
         showToast('🎉 Fantastisch!', 3000);
+        playSolveAnimation(newGuesses.map((g) => g.word), targetWord);
       } else if (newGuesses.length >= MAX_ATTEMPTS) {
         newStatus = 'lost';
         setGameStatus('lost');
@@ -292,7 +347,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
 
       isProcessing.current = false;
     }, 450);
-  }, [currentGuess, guesses, targetWord, validGuesses, usedLetters, gameMode, showToast, rejectGuess]);
+  }, [currentGuess, guesses, targetWord, validGuesses, usedLetters, gameMode, showToast, rejectGuess, playSolveAnimation]);
 
   const handleKey = useCallback(
     (key: string) => {
@@ -382,6 +437,8 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     toastVisible,
     tileColors,
     keyColors,
+    flipTiles,
+    solveAnimationMs,
     cycleTileColor,
     cycleKeyColor,
     clearColors,
