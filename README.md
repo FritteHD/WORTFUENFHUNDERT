@@ -1,32 +1,26 @@
-# React + TypeScript + Vite
+# WORTFÜNFHUNDERT
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+**WORT500** – ein deutsches Wörter-Rätsel im Stil von Wordle.
 
-Currently, two official plugins are available:
+Spielen: https://frittehd.github.io/WORTFUENFHUNDERT/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Spielprinzip
 
-## React Compiler
+Errate ein deutsches Wort mit 5 Buchstaben in maximal 8 Versuchen. Nach jedem Versuch gibt es nur drei Zahlen:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Grün** – Buchstaben an der richtigen Position
+- **Gelb** – richtige Buchstaben an der falschen Position
+- **Rot** – Buchstaben, die nicht im Wort vorkommen
 
-## Expanding the Oxlint configuration
+Welcher Buchstabe welche Farbe hat, findest du selbst heraus: Kacheln und Tasten lassen sich per Klick bzw. Rechtsklick einfärben. Mit SPACE setzt du einen Platzhalter (–).
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Modi: **Tägliches Rätsel** (für alle am selben Tag dasselbe Wort) und **Freies Spiel**.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Entwicklung
+
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Jeder Push auf `main` wird per GitHub Actions automatisch auf GitHub Pages veröffentlicht.

@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="w-full max-w-md mx-auto mb-2 sm:mb-4">
       <div className="bg-panel border border-line rounded-2xl px-3 sm:px-4 py-2.5 flex items-center justify-between shadow-md">
         {/* Left: Logo */}
-        <div className="flex items-center gap-2.5 select-none cursor-pointer" onClick={onHelp} title="Word500 Anleitung">
+        <div className="flex items-center gap-2.5 select-none cursor-pointer" onClick={onHelp} title="WORT500 Anleitung">
           {/* 2x2 Logo Grid */}
           <div className="w-8 h-8 rounded-lg overflow-hidden grid grid-cols-2 grid-rows-2 text-[11px] font-black leading-none text-white shadow-xs">
             <div className="bg-[#48bb78] flex items-center justify-center">W</div>
@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="bg-[#dc4d47] flex items-center justify-center">0</div>
           </div>
           <span className="text-xl sm:text-2xl font-black tracking-wider text-fg">
-            WORD500
+            WORT500
           </span>
         </div>
 

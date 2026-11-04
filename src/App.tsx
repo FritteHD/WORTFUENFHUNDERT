@@ -75,7 +75,7 @@ function App() {
             <div className="bg-[#d4b149] flex items-center justify-center">0</div>
             <div className="bg-[#dc4d47] flex items-center justify-center">0</div>
           </div>
-          <div className="text-2xl font-black text-fg tracking-widest mb-2">WORD500</div>
+          <div className="text-2xl font-black text-fg tracking-widest mb-2">WORT500</div>
           {loadError ? (
             <>
               <div className="text-sm text-[#dc4d47] font-semibold mb-3">

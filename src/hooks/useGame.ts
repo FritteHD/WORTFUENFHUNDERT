@@ -354,7 +354,7 @@ export function useGame(targetWords: string[], validGuesses: string[]): UseGameR
     const dateStr = gameMode === 'daily' ? dailyDateRef.current ?? getTodayDateString() : 'Freies Spiel';
     const wonStr = gameStatus === 'won' ? `${guesses.length}/${MAX_ATTEMPTS}` : `X/${MAX_ATTEMPTS}`;
 
-    let text = `Word500 (${dateStr}) ${wonStr}\n\n`;
+    let text = `WORT500 (${dateStr}) ${wonStr}\n\n`;
     for (const g of guesses) {
       text += `${'🟩'.repeat(g.green)}${'🟨'.repeat(g.yellow)}${'🟥'.repeat(g.red)}\n`;
     }
